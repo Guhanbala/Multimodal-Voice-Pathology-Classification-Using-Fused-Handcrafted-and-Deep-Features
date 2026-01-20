@@ -1,4 +1,4 @@
-# 🎙️ Hierarchical Voice Pathology Detection System
+i# 🎙️ Hierarchical Voice Pathology Detection System
 
 A deep learning-based system for detecting and classifying voice pathologies using speech signals and electroglottography (EGG) data. The system employs a two-stage hierarchical approach: first detecting healthy vs. pathological voices, then classifying the type of pathology.
 
@@ -56,10 +56,6 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. **Install FFmpeg**
-- **Ubuntu/Debian**: `sudo apt-get install ffmpeg`
-- **macOS**: `brew install ffmpeg`
-- **Windows**: Download from [ffmpeg.org](https://ffmpeg.org/download.html)
 
 ## 📂 Project Structure
 
