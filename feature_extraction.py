@@ -103,6 +103,13 @@ def save_mel_spectrogram(y, sr, out_path):
 # ================= MAIN PIPELINE =================
 
 metadata = pd.read_csv(METADATA_PATH)
+
+# 🔴 CRITICAL FIX: Check for split column
+if 'split' not in metadata.columns:
+    print("❌ ERROR: 'split' column missing in metadata.csv!")
+    print("Please run data.py first to generate the master split.")
+    exit(1)
+
 feature_rows = []
 
 for _, row in metadata.iterrows():
@@ -110,6 +117,7 @@ for _, row in metadata.iterrows():
     label = int(row["label"])
     age = row["age"]
     disease = row["disease"]
+    split = row["split"]  # 🔴 PRESERVE SPLIT
 
     class_folder = f"C{label}_" + disease.replace(" ", "_")
 
@@ -153,6 +161,7 @@ for _, row in metadata.iterrows():
         "patient_id": pid,
         "label": label,
         "age": age,
+        "split": split,  # 🔴 PRESERVE SPLIT
         "pitch": pitch,
         "jitter": jitter,
         "shimmer": shimmer,
@@ -181,5 +190,17 @@ df_features.to_csv(OUTPUT_DIR / "handcrafted_features.csv", index=False)
 
 print("✅ Feature extraction completed")
 print("Total samples:", len(df_features))
-print("Class distribution:")
-print(df_features["label"].value_counts())
+print("\nClass distribution:")
+print(df_features["label"].value_counts().sort_index())
+print("\nSplit distribution:")
+print(df_features["split"].value_counts())
+
+# Verify no leakage
+train_patients = set(df_features[df_features['split'] == 'train']['patient_id'])
+test_patients = set(df_features[df_features['split'] == 'test']['patient_id'])
+overlap = train_patients & test_patients
+
+if overlap:
+    print(f"\n❌ WARNING: {len(overlap)} patients appear in both train and test!")
+else:
+    print("\n✅ No patient leakage detected")
